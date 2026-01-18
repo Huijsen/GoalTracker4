@@ -22,9 +22,9 @@ import NetInfo from '@react-native-community/netinfo';
 import { styles } from './styles'; // <- import styles
 import { runMatching } from "./runMatching"; // Algorithm
 
-import useTasks from './Const/useTasks';
-import { ErrorOverlay, LoadingOverlay } from './Const/Overlay'; // adjust the path if needed
-import { OfflineIndicator } from './Const/OfflineIndicator'; // adjust path
+import useTasks from './useTasks';
+import { ErrorOverlay, LoadingOverlay } from './Overlay'; // adjust the path if needed
+import { OfflineIndicator } from './OfflineIndicator'; // adjust path
 
 // --- IMPORTS (functions) FOR COMPRIMIZING ---
 import GroupPeople from './Functions/GroupPeople';

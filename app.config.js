@@ -1,7 +1,7 @@
 export default ({ config }) => ({
   ...config,
   name: "Your Future",
-  slug: "Your Future",
+  slug: "yourfuture",
   version: "1.0.0",
 
   plugins: [
@@ -32,7 +32,7 @@ export default ({ config }) => ({
   },
     "extra": {
       "eas": {
-        "projectId": "b37e6859-a0d6-4481-b9ec-027725387425"
+        "projectId": "35abaab1-bcbb-4ef8-8502-70193c953994"
       }
     }
 });

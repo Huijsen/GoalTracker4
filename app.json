@@ -1,10 +1,14 @@
 {
   "expo": {
     "name": "Your Future",
-    "slug": "Your Future",
+    "slug": "yourfuture",
     "version": "1.0.0",
     "scheme": "yourfuture",
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "sdkVersion": "54.0.0",
     "icon": "./assets/icons/icon.png",
     "ios": {
@@ -28,9 +32,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "4146c11b-b843-4e52-9a67-f0cda047bca5"
+        "projectId": "35abaab1-bcbb-4ef8-8502-70193c953994"
       }
-    }
+    },
+    "owner": "huijsen"
   }
 }
-
