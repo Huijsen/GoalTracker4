@@ -13,7 +13,7 @@ export default ({ config }) => ({
 
   ios: {
     ...config.ios,
-    bundleIdentifier: "casper.yourfuture.V1",
+    bundleIdentifier: "casper.YourFuture.V1",
     buildNumber: "1",
     supportsTablet: true,
     icon: "./assets/icons/icon-1024.png",
@@ -23,7 +23,7 @@ export default ({ config }) => ({
   },
 
   android: {
-    package: "casper.yourfuture.V1",
+    package: "casper.YourFuture.V1",
     versionCode: 1,
     adaptiveIcon: {
       foregroundImage: "./assets/icons/adaptive-icon.png",

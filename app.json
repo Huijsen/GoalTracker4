@@ -12,13 +12,13 @@
     "sdkVersion": "54.0.0",
     "icon": "./assets/icons/icon.png",
     "ios": {
-      "bundleIdentifier": "rutten.yourfuture.v1",
+      "bundleIdentifier": "casper.YourFuture.v1",
       "buildNumber": "1",
       "icon": "./assets/icons/icon-1024.png",
       "supportsTablet": true
     },
     "android": {
-      "package": "rutten.yourfuture.v1",
+      "package": "casper.YourFuture.v1",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/adaptive-icon.png",
