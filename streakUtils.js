@@ -8,7 +8,8 @@ export function calculateStreaks(dates, completionsPerWeek) {
       consistency: '0%',
       weekStreak: 0,
       longestWeekStreak: 0,
-      weekConsistency: '0%'
+      weekConsistency: '0%',
+      weeks: []
     };
   }
 
@@ -32,61 +33,56 @@ export function calculateStreaks(dates, completionsPerWeek) {
 
   const lastDate = new Date(sorted[sorted.length - 1]);
   const today = new Date();
-  const diffLastToday = (today - lastDate) / (1000 * 60 * 60 * 24);
-  if (diffLastToday > 1) current = 0;
+  if ((today - lastDate) / (1000 * 60 * 60 * 24) > 1) current = 0;
 
   // Daily consistency
-  const firstDate = new Date(sorted[0]);
-  const totalDays = Math.floor((today - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+  const totalDays = Math.floor((today - new Date(sorted[0])) / (1000 * 60 * 60 * 24)) + 1;
   const consistencyPercent = Math.round((sorted.length / totalDays) * 100);
 
-  // ----- WEEKLY STREAKS (completions-based) -----
-  const weeks = {};
+  // ----- WEEKLY STREAKS -----
+  const weeksMap = {};
   dates.forEach(dateStr => {
     const d = new Date(dateStr);
     const year = d.getFullYear();
     const week = getWeekNumber(d);
     const key = `${year}-W${week}`;
-
-    if (!weeks[key]) weeks[key] = 0;
-    weeks[key]++; // count all completions, even same day
+    if (!weeksMap[key]) weeksMap[key] = 0;
+    weeksMap[key]++;
   });
 
-  // If quit goal → fill in missing weeks with 0 completions
-  if (completionsPerWeek === 0 && dates.length) {
-    const first = new Date(dates[0]);
-    const last = new Date(); // go until today
-    let current = new Date(first);
-
-    while (current <= last) {
-      const year = current.getFullYear();
-      const week = getWeekNumber(current);
-      const key = `${year}-W${week}`;
-      if (!weeks[key]) weeks[key] = 0; // ensure skipped week exists
-      current.setDate(current.getDate() + 7); // jump by 7 days
-    }
+  // Fill all weeks between first and last date
+  const first = new Date(sorted[0]);
+  const last = new Date(sorted[sorted.length - 1]);
+  let currentWeek = new Date(first);
+  while (currentWeek <= last) {
+    const year = currentWeek.getFullYear();
+    const week = getWeekNumber(currentWeek);
+    const key = `${year}-W${week}`;
+    if (!weeksMap[key]) weeksMap[key] = 0; // missing week = 0 completions
+    currentWeek.setDate(currentWeek.getDate() + 7);
   }
 
-  const weekKeys = Object.keys(weeks).sort();
+  // Build array of weeks with completions and hitGoal
+  const weeks = Object.keys(weeksMap).sort().map(key => ({
+    week: key,
+    completions: weeksMap[key],
+    hitGoal: completionsPerWeek === 0 ? weeksMap[key] === 0 : weeksMap[key] >= completionsPerWeek
+  }));
+
+  // Calculate week streaks
   let weekStreak = 0;
   let longestWeekStreak = 0;
   let successfulWeeks = 0;
-
   let lastWeekIndex = null;
-  weekKeys.forEach(wk => {
-    const [year, weekStr] = wk.split('-W');
-    const weekIndex = parseInt(year) * 52 + parseInt(weekStr); // simple index
 
-    let success = false;
-    if (completionsPerWeek === 0) success = weeks[wk] === 0;
-    else success = weeks[wk] >= completionsPerWeek;
+  weeks.forEach(wk => {
+    const [year, weekStr] = wk.week.split('-W');
+    const weekIndex = parseInt(year) * 52 + parseInt(weekStr);
+    const success = wk.hitGoal;
 
     if (success) {
-      if (lastWeekIndex !== null && weekIndex !== lastWeekIndex + 1) {
-        weekStreak = 1; // reset if not consecutive
-      } else {
-        weekStreak++;
-      }
+      if (lastWeekIndex !== null && weekIndex !== lastWeekIndex + 1) weekStreak = 1;
+      else weekStreak++;
       if (weekStreak > longestWeekStreak) longestWeekStreak = weekStreak;
       successfulWeeks++;
     } else {
@@ -96,10 +92,7 @@ export function calculateStreaks(dates, completionsPerWeek) {
     lastWeekIndex = weekIndex;
   });
 
-
-  const weekConsistency = weekKeys.length
-    ? Math.round((successfulWeeks / weekKeys.length) * 100) + '%'
-    : '0%';
+  const weekConsistency = weeks.length ? Math.round((successfulWeeks / weeks.length) * 100) + '%' : '0%';
 
   return {
     currentStreak: current,
@@ -107,6 +100,7 @@ export function calculateStreaks(dates, completionsPerWeek) {
     consistency: consistencyPercent + '%',
     weekStreak,
     longestWeekStreak,
-    weekConsistency
+    weekConsistency,
+    weeks
   };
 }
