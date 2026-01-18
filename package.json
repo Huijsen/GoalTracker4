@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "expo start",
-    "start:backend": "node server.js"
+    "start:backend": "node server.js",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
@@ -29,7 +31,8 @@
     "react-native-uuid": "^2.0.3",
     "react-native-web": "^0.21.0",
     "socket.io": "^4.8.1",
-    "socket.io-client": "^4.8.1"
+    "socket.io-client": "^4.8.1",
+    "expo": "~54.0.13"
   },
   "devDependencies": {
     "@types/react": "~19.1.10",
