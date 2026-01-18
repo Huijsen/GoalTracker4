@@ -18,6 +18,7 @@ export default function useTasks({
       desc: "Go till you drop down",
       timeTaken: 0,
       startTime: Date.now(),
+      checked: false, // NEW: checked property
       subtasks: [
         { text: "Pushups", desc: "Do 3 sets", checked: false },
         { text: "Pullups", desc: "Minimum 5", checked: false },
@@ -28,12 +29,12 @@ export default function useTasks({
       desc: "",
       timeTaken: 0,
       startTime: Date.now(),
+      checked: false, // NEW: checked property
       subtasks: [],
     },
   ]);
 
   const [checkedStates, setCheckedStates] = useState(Array(tasks.length).fill(false));
-  const [doneTasks, setDoneTasks] = useState([]);
   const [doneCollapsed, setDoneCollapsed] = useState(true);
 
   const [selectedSubtask, setSelectedSubtask] = useState(null);
@@ -82,6 +83,7 @@ export default function useTasks({
       subtasks: [],
       startTime: Date.now(),
       timeTaken: 0,
+      checked: false, // NEW: checked property
     };
 
     setTasks([newTask, ...tasks]);
@@ -97,7 +99,6 @@ export default function useTasks({
     setFilteredSuggestions([]);
   };
   
-
   const handleAddTask = () => {
     if (!newTaskText.trim()) {
       Alert.alert("Error", "Task cannot be empty");
@@ -105,7 +106,7 @@ export default function useTasks({
     }
 
     setTasks([
-      { text: newTaskText, desc: newTaskDesc, subtasks: [], startTime: Date.now(), timeTaken: 0 },
+      { text: newTaskText, desc: newTaskDesc, subtasks: [], startTime: Date.now(), timeTaken: 0, checked: false },
       ...tasks,
     ]);
 
@@ -130,68 +131,71 @@ export default function useTasks({
     const updated = [...tasks];
     const task = updated[index];
 
-    if (!task.startTime) task.startTime = Date.now();
+    // If checking the task (marking as done)
+    if (!task.checked) {
+      if (!task.startTime) task.startTime = Date.now();
+      const elapsedSeconds = Math.round((Date.now() - task.startTime) / 1000);
+      task.timeTaken = elapsedSeconds;
 
-    const elapsedSeconds = Math.round((Date.now() - task.startTime) / 1000);
-    task.timeTaken = elapsedSeconds;
+      // Handle goal updates
+      if (task.text.startsWith("Goal -")) {
+        const title = task.text.replace("Goal - ", "");
+        setGoals((prev) =>
+          prev.map((g) =>
+            g.title === title
+              ? {
+                  ...g,
+                  dates: [...g.dates, new Date().toISOString()],
+                  ...calculateStreaks([...g.dates, new Date().toISOString()], g.daysPerWeek),
+                  workoutCompleted: true,
+                }
+              : g
+          )
+        );
 
+        if (task.text === "Goal - Workout") setWorkoutCompleted(true);
+      }
+    } else {
+      // If unchecking the task (marking as not done)
+      task.startTime = Date.now();
+      task.timeTaken = 0;
+
+      // Handle goal updates for unchecking
+      if (task.text.startsWith("Goal -")) {
+        const title = task.text.replace("Goal - ", "");
+        setGoals((prev) =>
+          prev.map((g) =>
+            g.title === title
+              ? {
+                  ...g,
+                  dates: g.dates.slice(0, -1),
+                  ...calculateStreaks(g.dates.slice(0, -1), g.daysPerWeek),
+                  workoutCompleted: g.dates.length > 1,
+                }
+              : g
+          )
+        );
+
+        if (task.text === "Goal - Workout") setWorkoutCompleted(false);
+      }
+    }
+
+    // Toggle the checked state
+    task.checked = !task.checked;
     setTasks(updated);
-
-    if (task.text.startsWith("Goal -")) {
-      const title = task.text.replace("Goal - ", "");
-      setGoals((prev) =>
-        prev.map((g) =>
-          g.title === title
-            ? {
-                ...g,
-                dates: [...g.dates, new Date().toISOString()],
-                ...calculateStreaks([...g.dates, new Date().toISOString()], g.daysPerWeek),
-                workoutCompleted: true,
-              }
-            : g
-        )
-      );
-    }
-
-    setDoneTasks([...doneTasks, task]);
-    setTasks(tasks.filter((_, i) => i !== index));
-    setCheckedStates(checkedStates.filter((_, i) => i !== index));
-
-    if (task.text === "Goal - Workout") setWorkoutCompleted(true);
   };
 
-  const toggleUncheckDoneTask = (index) => {
-    const task = doneTasks[index];
-    task.startTime = Date.now();
-    task.timeTaken = 0;
+  // REMOVED: toggleUncheckDoneTask - no longer needed since we just toggle checked property
 
-    if (task.text.startsWith("Goal -")) {
-      const title = task.text.replace("Goal - ", "");
-      setGoals((prev) =>
-        prev.map((g) =>
-          g.title === title
-            ? {
-                ...g,
-                dates: g.dates.slice(0, -1),
-                ...calculateStreaks(g.dates.slice(0, -1), g.daysPerWeek),
-                workoutCompleted: g.dates.length > 1,
-              }
-            : g
-        )
-      );
-    }
-
-    if (task.text === "Goal - Workout") setWorkoutCompleted(false);
-
-    setTasks([...tasks, task]);
-    setCheckedStates([...checkedStates, false]);
-    setDoneTasks(doneTasks.filter((_, i) => i !== index));
-  };
+  // Compute active and done tasks from the single tasks array
+  const activeTasks = tasks.filter(t => !t.checked);
+  const doneTasks = tasks.filter(t => t.checked);
 
   return {
     tasks,
     checkedStates,
-    doneTasks,
+    activeTasks, // NEW: return filtered active tasks
+    doneTasks, // NEW: return filtered done tasks
     doneCollapsed,
     selectedSubtask,
     editedSubtaskText,
@@ -220,6 +224,6 @@ export default function useTasks({
     handleAddTask,
     handleDelete,
     toggleCheckTask,
-    toggleUncheckDoneTask,
+    //toggleUncheckDoneTask,
   };
 }
