@@ -23,12 +23,11 @@ export default function HomeTasks({
   handleAddTask,
   handleAddSuggestionTask,
   setIsAddingTask,
-  tasks,
+  activeTasks, // CHANGED: from tasks
   doneTasks,
   doneCollapsed,
   setDoneCollapsed,
   toggleCheckTask,
-  toggleUncheckDoneTask,
   updateSubtaskChecked,
   deleteSubtask,
   setSelectedTask,
@@ -40,6 +39,7 @@ export default function HomeTasks({
   setSubtaskFromTaskModal,
   setCurrentPage,
   inputRef,
+  tasks, // NEW: need full tasks array to find original index
 }) {
   const wrapperRef = useRef(null);
 
@@ -64,7 +64,6 @@ export default function HomeTasks({
     >
       <TouchableWithoutFeedback
         onPress={(e) => {
-          // only save if the tap is outside the input wrapper
           wrapperRef.current?.measure((fx, fy, width, height, px, py) => {
             const { locationX, locationY } = e.nativeEvent;
             if (
@@ -106,7 +105,7 @@ export default function HomeTasks({
                   style={styles.underlineInput}
                   autoFocus
                   onSubmitEditing={() => {
-                    if (newTaskText.trim()) saveTaskIfNeeded(); // save on Enter
+                    if (newTaskText.trim()) saveTaskIfNeeded();
                   }}
                 />
                 {filteredSuggestions.length > 0 && (
@@ -131,32 +130,37 @@ export default function HomeTasks({
             </View>
           )}
 
-          {/* Tasks list */}
-          {tasks.map((task, i) => (
-            <TaskItem
-              key={i}
-              text={task.text}
-              checked={false}
-              subtitle={task.desc}
-              subtasks={task.subtasks}
-              onToggle={() => toggleCheckTask(i)}
-              onToggleSubtask={(sub) => updateSubtaskChecked(i, sub)}
-              onDeleteSubtask={(sub) => deleteSubtask(i, sub)}
-              onPress={() => {
-                setSelectedTask(i);
-                setEditedText(task.text);
-                setEditedDesc(task.desc);
-                setCurrentPage('editTask');
-              }}
-              onPressSubtask={(subIdx) => {
-                setSelectedSubtask({ taskIdx: i, subIdx });
-                setEditedSubtaskText(task.subtasks[subIdx].text);
-                setEditedSubtaskDesc(task.subtasks[subIdx].desc || '');
-                setSubtaskFromTaskModal(false);
-                setCurrentPage('editSubtask');
-              }}
-            />
-          ))}
+          {/* Active Tasks list */}
+          {activeTasks.map((task) => {
+            // Find the original index in the full tasks array
+            const originalIndex = tasks.findIndex(t => t === task);
+            
+            return (
+              <TaskItem
+                key={originalIndex}
+                text={task.text}
+                checked={false}
+                subtitle={task.desc}
+                subtasks={task.subtasks}
+                onToggle={() => toggleCheckTask(originalIndex)}
+                onToggleSubtask={(subIdx) => updateSubtaskChecked(originalIndex, subIdx)}
+                onDeleteSubtask={(subIdx) => deleteSubtask(originalIndex, subIdx)}
+                onPress={() => {
+                  setSelectedTask(originalIndex);
+                  setEditedText(task.text);
+                  setEditedDesc(task.desc);
+                  setCurrentPage('editTask');
+                }}
+                onPressSubtask={(subIdx) => {
+                  setSelectedSubtask({ taskIdx: originalIndex, subIdx });
+                  setEditedSubtaskText(task.subtasks[subIdx].text);
+                  setEditedSubtaskDesc(task.subtasks[subIdx].desc || '');
+                  setSubtaskFromTaskModal(false);
+                  setCurrentPage('editSubtask');
+                }}
+              />
+            );
+          })}
 
           {/* Done toggle */}
           <TouchableOpacity
@@ -175,20 +179,26 @@ export default function HomeTasks({
             </Text>
           </TouchableOpacity>
 
+          {/* Done Tasks list */}
           {!doneCollapsed &&
-            doneTasks.map((task, i) => (
-              <TaskItem
-                key={i}
-                text={task.text}
-                checked
-                subtitle={task.desc}
-                subtasks={task.subtasks}
-                onToggle={() => toggleUncheckDoneTask(i)}
-                onToggleSubtask={() => {}}
-                onPress={() => {}}
-                onPressSubtask={() => {}}
-              />
-            ))}
+            doneTasks.map((task) => {
+              // Find the original index in the full tasks array
+              const originalIndex = tasks.findIndex(t => t === task);
+              
+              return (
+                <TaskItem
+                  key={originalIndex}
+                  text={task.text}
+                  checked={true}
+                  subtitle={task.desc}
+                  subtasks={task.subtasks}
+                  onToggle={() => toggleCheckTask(originalIndex)}
+                  onToggleSubtask={() => {}}
+                  onPress={() => {}}
+                  onPressSubtask={() => {}}
+                />
+              );
+            })}
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
