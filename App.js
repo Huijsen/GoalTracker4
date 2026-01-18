@@ -27,27 +27,27 @@ import { ErrorOverlay, LoadingOverlay } from './Overlay'; // adjust the path if 
 import { OfflineIndicator } from './OfflineIndicator'; // adjust path
 
 // --- IMPORTS (functions) FOR COMPRIMIZING ---
-import GroupPeople from './Functions/GroupPeople';
-import PageWithBack from './Functions/PageWithBack';
-import ExpandableGroup from './Functions/ExpandableGroup';
-import TaskItem from './Functions/TaskItem';
-import ArchivedBar from './Functions/ArchivedBar';
-import ExpandableBlock from './Functions/ExpandableBlock';
-import { countDone, countThisWeek } from './Functions/goalStats';
-import { calculateStreaks } from './Functions/streakUtils';
-import calculateWeekStreak from './Functions/calculateWeekStreak';
+import GroupPeople from './GroupPeople';
+import PageWithBack from './PageWithBack';
+import ExpandableGroup from './ExpandableGroup';
+import TaskItem from './TaskItem';
+import ArchivedBar from './ArchivedBar';
+import ExpandableBlock from './ExpandableBlock';
+import { countDone, countThisWeek } from './goalStats';
+import { calculateStreaks } from './streakUtils';
+import calculateWeekStreak from './calculateWeekStreak';
 
 // --- IMPORTS (Pages) FOR COMPRIMIZING ---
-import AddPeopleScreen from './Screens/AddPeopleScreen';
-import HelpScreen from './Screens/HelpScreen';
-import ArchivedScreen from './Screens/ArchivedScreen';
-import TargetScreen from './Screens/TargetScreen';
-import AddGoalScreen from './Screens/AddGoalScreen';
-import EditGoalScreen from './Screens/EditGoalScreen';
-import HomeTasks from './Screens/HomeTasks';
-import ProfilePage from './Screens/ProfilePage';
-import EditTaskPage from './Screens/EditTaskPage';
-import EditSubtaskPage from './Screens/EditSubtaskPage';
+import AddPeopleScreen from './AddPeopleScreen';
+import HelpScreen from './HelpScreen';
+import ArchivedScreen from './ArchivedScreen';
+import TargetScreen from './TargetScreen';
+import AddGoalScreen from './AddGoalScreen';
+import EditGoalScreen from './EditGoalScreen';
+import HomeTasks from './HomeTasks';
+import ProfilePage from './ProfilePage';
+import EditTaskPage from './EditTaskPage';
+import EditSubtaskPage from './EditSubtaskPage';
 
 // --- FIREBASE IMPORTS & CONFIGURATION START ---
 import { initializeApp } from "firebase/app";
